@@ -103,22 +103,22 @@ Several notebooks currently assume project folders such as `transcriptome/`, `VD
 - Some installation commands are embedded in notebooks. For a stable release, install dependencies in a dedicated environment rather than modifying the environment during analysis.
 - Random seeds, exact package versions, and a machine-readable environment specification should be added before the final journal or archive release.
 
-## Reproducibility status
+## Scope of this repository
 
-The notebooks document the analysis logic but are not yet a fully self-contained reproduction package because the input data, exact environment lock files, and public data accession are not included. A release tag should be created for the version associated with the submitted or accepted manuscript.
+This repository provides the analysis code associated with the study. Large input datasets and study-specific intermediate objects are maintained separately and are therefore not included here. Data-access information and a versioned software environment will be added alongside the final manuscript release.
 
-## Citation
+## Related manuscript
 
-If you use this code, please cite the associated manuscript:
+This code accompanies the manuscript:
 
-> Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*. Manuscript.
+> Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*.
 
-Replace this entry with the final journal citation and DOI after publication.
+The complete citation and DOI will be provided when they become available.
 
-## License
+## Code use
 
-No reuse license has been selected yet. The authors should add an appropriate `LICENSE` file before public release. Until then, the absence of a license means that reuse rights are not granted by this repository.
+The code is currently shared to support academic review and research transparency. For questions regarding reuse or redistribution before a formal license is added, please contact the study authors.
 
 ## Contact
 
-Please direct questions to the corresponding author listed in the manuscript. The authors may replace this sentence with a preferred public contact address before release.
+For questions about the code or analysis, please contact the corresponding authors listed in the manuscript.
