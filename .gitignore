@@ -1,0 +1,37 @@
+# Jupyter and Python
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+renv/library/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Large or derived single-cell and sequencing files
+data/
+results/
+*.h5ad
+*.loom
+*.rds
+*.mtx
+*.h5
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+
+# Operating-system files
+.DS_Store
+Thumbs.db
