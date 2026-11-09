@@ -1,124 +1,120 @@
 # oAd-mCD40L study analysis code
 
-This repository contains the analysis notebooks used for the single-cell RNA-seq and single-cell TCR-seq analyses in the manuscript:
+Analysis notebooks accompanying the study:
 
 > **Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity**
 
-The study investigates how an oncolytic adenovirus expressing membrane-bound CD40L (oAd-mCD40L) remodels the ovarian-cancer tumor microenvironment, with emphasis on macrophage reprogramming, CD8+ T-cell responses, cell-cell communication, gene trajectories, pathway activity, and TCR clonality.
+The repository covers single-cell RNA-seq, single-cell TCR-seq, cell-state trajectories, pathway analysis, cell-population enrichment and cell-cell communication in the ovarian-cancer tumor microenvironment.
 
 ## Repository contents
 
-| Notebook | Purpose |
-| --- | --- |
-| `pp_annotation_linear_original_cells.ipynb` | Main Python workflow for quality control, scVI-based integration, dimensionality reduction, clustering, cell-type annotation, marker analysis, differential expression, and export of major cell populations. |
-| `OR.ipynb` | Calculates treatment-associated enrichment or depletion of annotated cell populations using Fisher's exact test and visualizes odds ratios as a heatmap. |
-| `monocle.ipynb` | Performs Monocle/Monocle 3 trajectory and pseudotime analysis, primarily for the myeloid compartment. |
-| `Genetraj.ipynb` | Uses GeneTrajectory to infer gene-gene distances, gene programs, and ordered gene trajectories. |
-| `GSEA.ipynb` | Runs GSVA and GSEA-based pathway analysis using GO, KEGG, and related gene-set resources. |
-| `cellChat_pub.ipynb` | Reconstructs and compares cell-cell communication networks with CellChat and ligand-receptor information derived from CellPhoneDB. |
-| `scRepertoire.ipynb` | Integrates single-cell TCR data with annotated transcriptomes and analyzes clonal expansion, overlap, diversity, and treatment/site-specific repertoire patterns. |
+| Notebook | Main task | Language |
+| --- | --- | --- |
+| [`pp_annotation_linear_original_cells.ipynb`](pp_annotation_linear_original_cells.ipynb) | Quality control, scVI integration, clustering, annotation, differential expression and export of major cell populations | Python |
+| [`OR.ipynb`](OR.ipynb) | Fisher's exact tests and odds-ratio heatmaps for cell-population enrichment/depletion | Python |
+| [`monocle.ipynb`](monocle.ipynb) | Monocle 3 trajectory and pseudotime analysis of the myeloid compartment | R |
+| [`Genetraj.ipynb`](Genetraj.ipynb) | GeneTrajectory gene-program and ordered-trajectory analysis | R/Python |
+| [`GSEA.ipynb`](GSEA.ipynb) | GSVA/GSEA pathway analysis | R |
+| [`cellChat_pub.ipynb`](cellChat_pub.ipynb) | Per-sample CellChat inference and exploratory 2 x 2 treatment comparisons | R |
+| [`scRepertoire.ipynb`](scRepertoire.ipynb) | TCR clonality, overlap, diversity and transcriptome integration | R |
 
-## Suggested analysis order
+Notebook outputs are intentionally cleared in the public repository. Figures and tables are regenerated from the study data.
 
-1. Process raw sequencing reads with the upstream CeleScope workflow. The upstream read-processing pipeline is not included here.
-2. Run `pp_annotation_linear_original_cells.ipynb` to create the integrated and annotated single-cell objects.
-3. Run `OR.ipynb` to compare cell-type distributions among treatment groups.
-4. Run `monocle.ipynb` and `Genetraj.ipynb` for cell-state and gene-program trajectory analyses.
-5. Run `GSEA.ipynb` for pathway-level interpretation.
-6. Run `cellChat_pub.ipynb` for cell-cell communication analysis.
-7. Run `scRepertoire.ipynb` for TCR repertoire analysis.
+## Recommended workflow
 
-The exact order of downstream notebooks can be changed after the annotated objects and metadata tables have been generated.
+1. Process raw sequencing reads with the upstream CeleScope workflow (not included).
+2. Run `pp_annotation_linear_original_cells.ipynb` to generate the integrated object and annotated population-level objects.
+3. Run `OR.ipynb` for population-composition comparisons.
+4. Convert/export the annotated myeloid object to the Seurat RDS expected by `monocle.ipynb`, then run Monocle 3.
+5. Run `Genetraj.ipynb` and `GSEA.ipynb` for gene-program and pathway analyses.
+6. Export the count matrix and cell metadata described below, then run `cellChat_pub.ipynb`.
+7. Run `scRepertoire.ipynb` for the TCR analysis.
+
+The downstream notebooks are independent after the annotated objects and metadata tables have been generated.
+
+## Configuration and expected inputs
+
+Large data files are not stored in GitHub. Paths are configured near the top of each notebook.
+
+### Main annotation notebook
+
+`pp_annotation_linear_original_cells.ipynb` reads a pooled AnnData file. The default lookup order is:
+
+1. the path in `OAD_POOL_H5AD`;
+2. `OAD_DATA_DIR/pool_raw.h5ad`;
+3. `./pool_raw.h5ad`.
+
+If `OAD_DATA_DIR` is not set, it defaults to `transcriptome/`. Example on Linux/macOS:
+
+```bash
+export OAD_DATA_DIR=/path/to/study/transcriptome
+export OAD_POOL_H5AD=/path/to/study/pool_raw.h5ad
+```
+
+The AnnData object must contain the metadata fields used by the notebook, including `Sample_id`, `treatment`, `n_genes_by_counts`, `pct_counts_mt`, `total_counts` and `pct_counts_Rp`.
+
+### Monocle 3 notebook
+
+By default, `monocle.ipynb` expects:
+
+```text
+transcriptome/pool_Myeloid_DEG/pool_Myeloid_anno_raw.rds
+```
+
+The Seurat object must contain `Sample_id`, `treatment` and `anno_sub`. Edit `project_ID`, `mtx`, `n_neighbors`, `min_dist` and `early_genes` in the configuration cell when needed. The notebook now computes PCA before UMAP, learns the principal graph before ordering cells and saves the final `cell_data_set` as `monocle3_cds.rds`.
+
+### CellChat notebook
+
+By default, `cellChat_pub.ipynb` expects:
+
+```text
+transcriptome/pool_DEG/pool_raw.csv
+transcriptome/pool_DEG/meta_treatment_anno.csv
+```
+
+Count-matrix columns and metadata row names must contain the same cell barcodes. Metadata must include `anno_sub` and `Treatment_Sample`.
+
+The notebook uses `CellChatDB.mouse` by default. To use four CellPhoneDB-derived tables, set `use_custom_cellphonedb <- TRUE` and define `CELLPHONEDB_DIR`. The required files are:
+
+```text
+interaction_input_CellChatDB.csv
+complex_input_CellChatDB.csv
+cofactor_input_CellChatDB.csv
+geneInfo_input_CellChatDB.csv
+```
+
+The macrophage label is standardized to `TAM.M2` across the three updated notebooks. The 2 x 2 CellChat comparison has only two samples per group; its consistency scores, effect sizes and p-values are exploratory. Pairwise contrasts share samples and must not be interpreted as independent biological replicates or as confirmatory inference.
 
 ## Software
 
 The notebooks use both Python and R.
 
-### Python
+Main Python dependencies include `scanpy`, `scvi-tools`, `scvelo`, `scrublet`, `anndata`, `pandas`, `numpy`, `scipy`, `scikit-learn`, `matplotlib` and `seaborn`.
 
-Major packages include:
+Main R dependencies include `Seurat`, `SeuratWrappers`, `monocle3`, `CellChat`, `scRepertoire`, `GeneTrajectory`, `GSVA`, `GSEABase`, `clusterProfiler`, `msigdbr`, `ComplexHeatmap`, `circlize`, `igraph`, `patchwork` and `ggplot2`.
 
-- `scanpy`
-- `scvi-tools`
-- `scvelo`
-- `scrublet`
-- `anndata`
-- `pandas`
-- `numpy`
-- `scipy`
-- `scikit-learn`
-- `matplotlib`
-- `seaborn`
+Exact versions are not yet fully locked. Before archival release, add machine-readable environment files such as `environment.yml`/`requirements.txt` and `renv.lock`, then record `sessionInfo()` and `sc.logging.print_versions()` from the final analysis environments.
 
-The manuscript reports Scanpy 1.9.1 and scVI 1.1.6 for the principal single-cell workflow.
+## Data availability and privacy
 
-### R
+Do not upload controlled-access human data, identifiable sample information, FASTQ/BAM files or large processed objects to GitHub. Deposit raw and processed sequencing data in an appropriate scientific repository and replace the placeholder below with the public accession and access conditions.
 
-Major packages include:
+> **Data accession:** TODO — add repository name, accession identifier and release date.
 
-- `Seurat` and `SeuratWrappers`
-- `CellChat`
-- `scRepertoire`
-- `monocle` and `monocle3`
-- `GeneTrajectory`
-- `GSVA`, `GSEABase`, `clusterProfiler`, and `msigdbr`
-- `ComplexHeatmap`, `pheatmap`, `ggplot2`, and related visualization packages
-- `sscVis`
-- `reticulate` and `sceasy`
+## Reproducibility checklist before publication
 
-The manuscript reports CopyKAT 1.1.0, Hotspot 0.9.0, and GeneTrajectory 1.0.0 for associated analyses. Package versions should be recorded in a lock file or environment export before the final archival release.
+- [ ] Add the raw/processed data accession and access instructions.
+- [ ] Add the final manuscript citation and DOI.
+- [ ] Add Python and R environment lock files.
+- [ ] Confirm sample IDs, treatment labels and cell-type labels against the final metadata.
+- [ ] Run all notebooks from a clean environment and archive session/version information.
+- [ ] Add an explicit open-source license (for example, MIT, BSD-3-Clause or GPL-3.0) after the authors select the intended reuse terms.
+- [ ] Replace the generic contact statement with a maintained email address or issue-tracker policy.
 
-## Input data
+## Citation
 
-Sequencing data and large processed objects are not included in this repository. The notebooks expect files such as:
+Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*. Full journal citation and DOI to be added when available.
 
-- annotated or raw `.h5ad` objects;
-- Seurat `.rds` objects;
-- count matrices and cell metadata tables;
-- V(D)J contig-annotation files;
-- CellPhoneDB-derived ligand-receptor tables.
+## License and contact
 
-Before publication, add the public accession or archive link for the raw and processed data here:
-
-> **Data accession:** to be added by the authors.
-
-Do not upload controlled-access human data, identifiable sample information, raw FASTQ/BAM files, or other large data directly to GitHub. Deposit sequencing data in an appropriate scientific repository and link the accession from this README.
-
-## Running the notebooks
-
-1. Clone or download this repository.
-2. Create Python and R environments containing the packages listed above.
-3. Download the study data from the accession that will be added to this README.
-4. Recreate the expected local directory structure or update each notebook's configuration cells.
-5. Start JupyterLab and run the notebooks in the suggested order.
-
-Several notebooks currently assume project folders such as `transcriptome/`, `VDJ/`, or `TCR/`. Edit the `mtx`, `outputdir`, `project_ID`, and related variables near the beginning of each notebook to match your system.
-
-## Portability and reproducibility notes
-
-- `Genetraj.ipynb` contains an author-specific Python interpreter path under `/home/xili/`; replace it with the path to your own environment.
-- `GSEA.ipynb` contains an author-specific working path under `/home/xili/Documents/GSEA`; replace it before running.
-- `cellChat_pub.ipynb` contains an author-specific CellPhoneDB directory under `/media/xili/`; replace it with your local database path.
-- In the CellChat database-loading cell, verify that the interaction, complex, cofactor, and gene-information objects each point to the intended input table before running the analysis.
-- Some installation commands are embedded in notebooks. For a stable release, install dependencies in a dedicated environment rather than modifying the environment during analysis.
-- Random seeds, exact package versions, and a machine-readable environment specification should be added before the final journal or archive release.
-
-## Scope of this repository
-
-This repository provides the analysis code associated with the study. Large input datasets and study-specific intermediate objects are maintained separately and are therefore not included here. Data-access information and a versioned software environment will be added alongside the final manuscript release.
-
-## Related manuscript
-
-This code accompanies the manuscript:
-
-> Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*.
-
-The complete citation and DOI will be provided when they become available.
-
-## Code use
-
-The code is currently shared to support academic review and research transparency. For questions regarding reuse or redistribution before a formal license is added, please contact the study authors.
-
-## Contact
-
-For questions about the code or analysis, please contact the corresponding authors listed in the manuscript.
+No software license has been selected yet; reuse terms are therefore not granted by this repository alone. For questions about the analysis, contact the corresponding authors listed in the manuscript or open a GitHub issue.
