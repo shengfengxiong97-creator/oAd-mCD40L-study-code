@@ -99,6 +99,8 @@ Package versions should be matched to the analysis environment used for this stu
 
 This repository contains analysis code and does not include raw sequencing data, large processed objects, controlled-access data or identifiable sample information. The notebooks use local input files as described above. Data access and sharing are governed by the associated study and applicable repository and privacy requirements.
 
+The updated SRA submission metadata for the retained single-cell RNA-seq and TCR-seq libraries is available in [`SRA_metadata.xlsx`](SRA_metadata.xlsx).
+
 ## Citation
 
 Please cite the associated manuscript:
