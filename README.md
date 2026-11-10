@@ -32,6 +32,14 @@ Notebook outputs are intentionally cleared in the public repository. Figures and
 
 The downstream notebooks are independent after the annotated objects and metadata tables have been generated.
 
+## Mouse Sample Information
+
+| Treatment group | Mouse sample IDs |
+| --------------- | ---------------- |
+| oAd             | V40, V42         |
+| oAd-wtCD40L     | V5, V4           |
+| oAd-mCD40L      | V21, V47         |
+
 ## Configuration and expected inputs
 
 Large data files are not stored in GitHub. Paths are configured near the top of each notebook.
