@@ -101,28 +101,18 @@ Main Python dependencies include `scanpy`, `scvi-tools`, `scvelo`, `scrublet`, `
 
 Main R dependencies include `Seurat`, `SeuratWrappers`, `monocle3`, `CellChat`, `scRepertoire`, `GeneTrajectory`, `GSVA`, `GSEABase`, `clusterProfiler`, `msigdbr`, `ComplexHeatmap`, `circlize`, `igraph`, `patchwork` and `ggplot2`.
 
-Exact versions are not yet fully locked. Before archival release, add machine-readable environment files such as `environment.yml`/`requirements.txt` and `renv.lock`, then record `sessionInfo()` and `sc.logging.print_versions()` from the final analysis environments.
+Package versions should be matched to the analysis environment used for this study. Installed versions can be recorded with `sessionInfo()` in R and `sc.logging.print_versions()` in Python when reproducing the workflow.
 
 ## Data availability and privacy
 
-Do not upload controlled-access human data, identifiable sample information, FASTQ/BAM files or large processed objects to GitHub. Deposit raw and processed sequencing data in an appropriate scientific repository and replace the placeholder below with the public accession and access conditions.
-
-> **Data accession:** TODO — add repository name, accession identifier and release date.
-
-## Reproducibility checklist before publication
-
-- [ ] Add the raw/processed data accession and access instructions.
-- [ ] Add the final manuscript citation and DOI.
-- [ ] Add Python and R environment lock files.
-- [ ] Confirm sample IDs, treatment labels and cell-type labels against the final metadata.
-- [ ] Run all notebooks from a clean environment and archive session/version information.
-- [ ] Add an explicit open-source license (for example, MIT, BSD-3-Clause or GPL-3.0) after the authors select the intended reuse terms.
-- [ ] Replace the generic contact statement with a maintained email address or issue-tracker policy.
+This repository contains analysis code and does not include raw sequencing data, large processed objects, controlled-access data or identifiable sample information. The notebooks use local input files as described above. Data access and sharing are governed by the associated study and applicable repository and privacy requirements.
 
 ## Citation
 
-Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*. Full journal citation and DOI to be added when available.
+Please cite the associated manuscript:
+
+> Xiong S, Si Y, Zhang X, et al. *Oncolytic membrane-bound CD40L rewires macrophages to boost CD8+ T cell responses and antitumor immunity*.
 
 ## License and contact
 
-No software license has been selected yet; reuse terms are therefore not granted by this repository alone. For questions about the analysis, contact the corresponding authors listed in the manuscript or open a GitHub issue.
+The code is shared for academic review and research transparency. Unless an explicit license is provided, standard copyright terms apply. For questions about the analysis, contact the corresponding authors listed in the manuscript or open a GitHub issue.
